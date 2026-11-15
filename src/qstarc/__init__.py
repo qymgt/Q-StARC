@@ -6,7 +6,7 @@ functions are accessed. Certificate replay does not require JAX or CVXPY.
 
 from importlib import import_module
 
-__version__ = "1.0.0"
+__version__ = "1.0.1"
 
 _EXPORTS = {
     "optimize_povm": "optimizer",

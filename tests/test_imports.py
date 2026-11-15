@@ -9,7 +9,7 @@ class ImportTests(unittest.TestCase):
     def test_base_import_is_lazy(self):
         code = (
             "import sys, qstarc; "
-            "assert qstarc.__version__ == '1.0.0'; "
+            "assert qstarc.__version__ == '1.0.1'; "
             "assert not ({'jax', 'cvxpy', 'clarabel'} & sys.modules.keys())"
         )
         subprocess.run([sys.executable, "-c", code], check=True)
