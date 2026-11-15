@@ -1,0 +1,7 @@
+include README.md NOTICE requirements.txt
+include examples/qubit_workflow.py
+include examples/paper_models.py
+include examples/paper_settings.json
+include examples/run_paper_candidate.py
+recursive-include tests *.py *.json
+global-exclude __pycache__ *.py[cod] .DS_Store
