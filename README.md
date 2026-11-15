@@ -174,19 +174,19 @@ names and saved-array keys are retained for compatibility.
 The paper's $M=(M_x)$ is a POVM, not an outcome count:
 $u_x=Z^\dagger e_x$ and $M_x=u_xu_x^\dagger$. The legacy key `Q` denotes
 $Z$, not the kernel projector $Q=I-P$ used in the theory. Likewise, the
-certificate key `rank` denotes $\operatorname{rank}\rho$, not the Bloch radius.
-We use $\operatorname{tr}$ for operator traces and $\operatorname{Tr}$ for
+certificate key `rank` denotes $\mathrm{rank}\,\rho$, not the Bloch radius.
+We use $\mathrm{tr}$ for operator traces and $\mathrm{Tr}$ for
 parameter-matrix traces, as in the paper; NumPy uses `trace` for both.
 
 For general weights, Sec. III G uses $T=W^{-1/2}$,
 $\widetilde D_i=\sum_j D_jT_{ji}$ and $\widetilde F=T^{\mathsf T}FT$, so
-$\operatorname{Tr}\widetilde F^{-1}=\operatorname{Tr}(WF^{-1})$.
+$\mathrm{Tr}\,\widetilde F^{-1}=\mathrm{Tr}(WF^{-1})$.
 The optimizer's `minimum` is the unit-weight objective in the supplied
 coordinates; apply any example-specific `risk_scale` to obtain `paper_risk`.
 
 In Experiments 1 and 2, Eq. (7.3) gives
-$c_{\mathrm{num}}=N\operatorname{Tr}\widetilde F^{-1}$. The search optimizes
-$\operatorname{Tr}\widetilde F^{-1}$ before applying the factor $N$.
+$c_{\mathrm{num}}=N\mathrm{Tr}\,\widetilde F^{-1}$. The search optimizes
+$\mathrm{Tr}\,\widetilde F^{-1}$ before applying the factor $N$.
 The diagonal two-copy example retains its historical coordinates and the
 final `153/223` reporting scale.
 
@@ -198,7 +198,7 @@ finite costs. No probability floor or Fisher ridge is used.
 
 ## Certification scope and SOS formulation
 
-The candidate risk $c_{\mathrm{num}}=\operatorname{Tr}(WF^{-1})$ is a floating-point evaluation of the
+The candidate risk $c_{\mathrm{num}}=\mathrm{Tr}(WF^{-1})$ is a floating-point evaluation of the
 constructed measurement. It is not a rigorous upper certificate or proof
 of global optimality. A raw SDP objective is also not a certificate.
 
@@ -207,10 +207,10 @@ formulation of Secs. IV and V. The denominator exponent is `level=m`.
 It uses identity weight in the supplied derivative coordinates, with
 $A_i=\sum_j B_{ij}D_j$ and
 $Q_{B,X}(\xi)=X+\|\xi\|^2\rho-2\sum_i\xi_i A_i$.
-It minimizes $\operatorname{tr}X$ subject to a Gram representation of
+It minimizes $\mathrm{tr}\,X$ subject to a Gram representation of
 $(1+\|\xi\|^2)^m Q_{B,X}(\xi)$.
 The raw value `2*trace(B)-raw_support_upper` is a numerical approximation
-to the fixed-$B$ optimum $c_m(I_d;B)=2\operatorname{Tr}B-d_m(B)$; feasibility
+to the fixed-$B$ optimum $c_m(I_d;B)=2\mathrm{Tr}\,B-d_m(B)$; feasibility
 and optimality are not certified by the solver. The joint optimization over $B$ defining
 $c_m(W)$ in Sec. VI is not implemented here.
 
