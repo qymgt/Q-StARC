@@ -33,8 +33,8 @@ from ._rational import (add_matrix, arrays, downward, entry, exact_model,
     fraction_matrix, homogenize, integer, monomial_bound, upward,
     validate_basis_blocks, validate_model, weight_coefficients)
 
-SOLUTION_FORMAT = 'qstarc-dual3-denominator-v1'
-CERTIFICATE_FORMAT = 'qstarc-dual3-certificate-v1'
+SOLUTION_FORMAT = 'qstarc-sos-proposal-v1'
+CERTIFICATE_FORMAT = 'qstarc-risk-certificate-v1'
 SCOPE = (
     'Exact dyadic interpretation of saved binary64 rho,D,B. All-POVM lower '
     'bound on the associated Fisher inverse cost. No ideal-state, '
@@ -62,7 +62,8 @@ def _load(path):
     with np.load(path, allow_pickle=False) as saved:
         data = {k: saved[k] for k in saved.files}
     if _scalar(data, 'format_version') != SOLUTION_FORMAT:
-        raise ValueError('Unsupported solution file format')
+        raise ValueError('Unsupported proposal format; use the certifier version matching '
+                         'this file. Do not rewrite archived artifacts.')
     if _scalar(data, 'method') != 'denominator':
         raise ValueError('Only denominator-SOS proposals are supported')
     for key in ('rho', 'D', 'B', 'X'):
@@ -211,7 +212,7 @@ def _repaired_bound(loaded, proof, factor_bits, monomial_bits):
         gram_sizes=[len(b) for b in bases])
 
 
-def certify_dual3(solution_path, *, factor_bits=40, monomial_bits=40, output_dir=None):
+def certify_risk_bound(solution_path, *, factor_bits=40, monomial_bits=40, output_dir=None):
     """Create an exact all-POVM bound for the saved binary64 input model.
 
     PSD factors are proposed by floating-point eigendecomposition, rounded to
@@ -224,8 +225,8 @@ def certify_dual3(solution_path, *, factor_bits=40, monomial_bits=40, output_dir
     ``certificates/<stem>_dyadic_factors.npz`` next to the solution. File
     references in the certificate are relative, permitting directory moves.
 
-    ``solution_path`` must be an NPZ produced by solve_dual3 or
-    save_dual3_solution. ``factor_bits`` and ``monomial_bits`` are integer
+    ``solution_path`` must be an NPZ produced by solve_fixed_b_sos or
+    save_sos_proposal. ``factor_bits`` and ``monomial_bits`` are integer
     dyadic precisions between 0 and 256. ``output_dir`` optionally changes the
     destination. Existing certificate/factor files at that location are
     overwritten. The returned dict contains exact Fraction strings, outward
@@ -264,14 +265,14 @@ def certify_dual3(solution_path, *, factor_bits=40, monomial_bits=40, output_dir
     return dict(result, certificate_path=str(certificate_path), proof_path=str(proof_path))
 
 
-def replay_dual3_certificate(certificate_path):
+def verify_risk_certificate(certificate_path):
     """Recompute and compare every mathematical claim without a solver/eigensystem.
 
     This checks the stored factors against the saved input, not against an
     independently supplied ideal physical model. Altered hashes, factors,
     basis partitions, exact values, or normalization flags cause an error.
 
-    ``certificate_path`` is a JSON certificate produced by certify_dual3.
+    ``certificate_path`` is a JSON certificate produced by certify_risk_bound.
     Return a dictionary with ``verified=True``, exact/rational bound fields,
     normalization flags, and replay time. All model/proof files are read-only.
     """
@@ -279,7 +280,8 @@ def replay_dual3_certificate(certificate_path):
     path = Path(certificate_path).resolve()
     record = json.loads(path.read_text(encoding='utf-8'))
     if record.get('schema') != CERTIFICATE_FORMAT:
-        raise ValueError('Unsupported certificate format')
+        raise ValueError('Unsupported certificate format; use the verifier version matching '
+                         'this certificate. Do not rewrite archived artifacts.')
     for key in ('input_file', 'proof_file', 'input_sha256', 'proof_sha256'):
         if not isinstance(record.get(key), str):
             raise ValueError(f'Missing certificate field {key}')

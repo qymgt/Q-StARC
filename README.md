@@ -86,27 +86,32 @@ bound or proof of global optimality.
 Continue in the same Python session, using `best` from the quick start:
 
 ```python
-from qstarc import solve_dual3, certify_dual3, replay_dual3_certificate
+from qstarc import solve_fixed_b_sos, certify_risk_bound, verify_risk_certificate
 
 solution_path = "results/quickstart/solution.npz"
-proposal = solve_dual3(
+proposal = solve_fixed_b_sos(
     best["rho"], best["D"], best["B"],
     level=1, output_path=solution_path,
 )
-certificate = certify_dual3(solution_path)
-verified = replay_dual3_certificate(certificate["certificate_path"])
+certificate = certify_risk_bound(solution_path)
+verified = verify_risk_certificate(certificate["certificate_path"])
 print("certified lower =", certificate["risk_lower"])
 print("exact rational value =", certificate["risk_lower_exact"])
 print("verified =", verified["verified"])
 ```
 
 `level=1` means the denominator-SOS level $m=1$, with $B$ held fixed.
-The raw SDP objective is uncertified; `certify_dual3` repairs it and
-`replay_dual3_certificate` checks the saved proof without a solver.
+The raw SDP objective is uncertified; `certify_risk_bound` repairs it and
+`verify_risk_certificate` checks the saved proof without a solver.
 The lower bound concerns the saved state and derivatives; the quick-start
 model has exactly representable dyadic entries. See the certification scope
 below for general inputs. These API calls overwrite files at their chosen
 destinations.
+
+Proposal files use format `qstarc-sos-proposal-v1`; certificates use
+`qstarc-risk-certificate-v1`. Each verifier accepts its declared format.
+For other archived formats, use the matching archived verifier; do not
+edit certificate contents or referenced files to change their format.
 
 ## Run the supplied end-to-end demo
 
@@ -193,14 +198,13 @@ finite costs. No probability floor or Fisher ridge is used.
 
 ## Certification scope and SOS formulation
 
-
 The candidate risk $c_{\mathrm{num}}=\operatorname{Tr}(WF^{-1})$ is a floating-point evaluation of the
 constructed measurement. It is not a rigorous upper certificate or proof
 of global optimality. A raw SDP objective is also not a certificate.
 
-The historical API name `dual3` denotes the fixed-coefficient formulation
-of Secs. IV and V, not a hierarchy level. It uses identity weight in the
-supplied derivative coordinates, with
+`solve_fixed_b_sos` implements the fixed-coefficient denominator-SOS
+formulation of Secs. IV and V. The denominator exponent is `level=m`.
+It uses identity weight in the supplied derivative coordinates, with
 $A_i=\sum_j B_{ij}D_j$ and
 $Q_{B,X}(\xi)=X+\|\xi\|^2\rho-2\sum_i\xi_i A_i$.
 It minimizes $\operatorname{tr}X$ subject to a Gram representation of
@@ -255,7 +259,7 @@ python -m unittest discover -s tests -v
 
 Tests cover optimizer regression against a small frozen reference, model
 and weight conventions, SOS splitting, and exact certificate validation.
-Optional-component tests skip if their dependencies are absent. All 22
+Optional-component tests skip if their dependencies are absent. All 23
 tests passed in a clean Python 3.12.14 environment on macOS arm64, using
 NumPy 2.5.4, JAX 0.11.2, CVXPY 1.9.3, and Clarabel 0.11.1.
 The two Python quick-start blocks above were also executed together:

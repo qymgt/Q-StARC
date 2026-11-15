@@ -1,4 +1,4 @@
-"""Q-StARC: local POVM optimization and dual3 risk certification.
+"""Q-StARC: local POVM optimization and SOS risk-bound certification.
 
 Optional optimization and SDP dependencies are loaded only when their
 functions are accessed. Certificate replay does not require JAX or CVXPY.
@@ -19,9 +19,10 @@ _EXPORTS = {
     "qubit_model_sld": "models",
     "qbit_model_n": "models",
     "whiten_derivatives": "models",
-    "solve_dual3": "dual3",
-    "certify_dual3": "certification",
-    "replay_dual3_certificate": "certification",
+    "solve_fixed_b_sos": "sos",
+    "save_sos_proposal": "sos",
+    "certify_risk_bound": "certification",
+    "verify_risk_certificate": "certification",
 }
 
 __all__ = ["__version__", *_EXPORTS]

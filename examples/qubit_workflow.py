@@ -5,8 +5,8 @@ environment; the exchange files contain no pickled objects or absolute paths.
 The fixed r=1/2, N=2 Bloch model is exactly dyadic and trace normalized.
 Paper notation: n=4, d=3, default s=8, Z is saved as Q, and W=I_3.
 c_num is numerical; c_cert_lower denotes the certified lower bound
-underline c_cert for this saved-input model. The historical API name
-dual3 is retained; the denominator exponent is m=level.
+underline c_cert for this saved-input model. The fixed-coefficient SOS
+calculation uses denominator exponent m=level.
 """
 
 from __future__ import annotations
@@ -79,25 +79,25 @@ def optimize(args: argparse.Namespace) -> None:
 
 
 def dual(args: argparse.Namespace) -> None:
-    from qstarc import certify_dual3, solve_dual3
+    from qstarc import certify_risk_bound, solve_fixed_b_sos
 
     target = args.output / "solution.npz"
     require_new(target, args.overwrite)
     with np.load(args.output / "candidate.npz", allow_pickle=False) as data:
-        result = solve_dual3(
+        result = solve_fixed_b_sos(
             data["rho"], data["D"], data["B"], level=1,
             tolerance=1e-9, output_path=target,
         )
-    certificate = certify_dual3(target)
+    certificate = certify_risk_bound(target)
     print(f"Fixed-B SOS, m=1 (uncertified): {result['raw_risk_lower']:.12f} ({result['status']})")
     print(f"c_cert_lower (saved-input model): {certificate['risk_lower']:.12f}")
 
 
 def verify(args: argparse.Namespace) -> None:
-    from qstarc import replay_dual3_certificate
+    from qstarc import verify_risk_certificate
 
     path = args.output / "certificates" / "solution_certificate.json"
-    result = replay_dual3_certificate(path)
+    result = verify_risk_certificate(path)
     if not result["verified"]:
         raise RuntimeError("Certificate replay did not verify")
     print(f"PASS: exact rational replay; lower bound {result['risk_lower']:.12f}")

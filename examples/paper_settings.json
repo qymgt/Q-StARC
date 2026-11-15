@@ -12,7 +12,7 @@
     "Z": "Stiefel frame, saved as Q; the POVM is M=(M_x), with M_x=Z^dagger e_x e_x^dagger Z",
     "D_tilde_and_F_tilde": "Transformed-coordinate derivatives and Fisher matrix, saved as D and F in candidate files",
     "c_num": "Floating-point weighted candidate risk, saved as paper_risk after applying risk_scale",
-    "m": "SOS denominator exponent, called level in the dual3 API",
+    "m": "SOS denominator exponent, called level in the fixed-coefficient SOS API",
     "trace": "tr for operators on the Hilbert space; Tr for matrices on parameter space"
   },
   "selection": "Smallest finite final risk among the specified random seeds. Nonconverged finite endpoints remain eligible; preserve their status.",
